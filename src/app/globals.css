@@ -1,66 +1,258 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════
+   Theme — Dark neutral backgrounds with blue accents
+   Backgrounds: Catppuccin Mocha dark grays (neutral, not blue-tinted)
+   Accents: SVG-matched sky blue (#38bdf8) + blue family
+   ═══════════════════════════════════════════════════════════ */
 @theme {
-  --color-matrix: #00ff00;
-  --color-cyberpunk-accent: #00f0ff;
-  --color-cyberpunk-bg: #0a0015;
-  --color-hacker-bg: #000000;
-  --color-hacker-text: #00ff00;
-  --color-error: #ff0000;
-  --color-warning: #ffff00;
-  --color-terminal-text: #00ff00;
+  /* Warm/Red family — kept for terminal semantics */
+  --color-ctp-rosewater: #fecdd3;
+  --color-ctp-flamingo: #fda4af;
+  --color-ctp-pink: #f9a8d4;
+  --color-ctp-red: #f87171;
+  --color-ctp-maroon: #fb7185;
+  --color-ctp-peach: #fb923c;
+  --color-ctp-yellow: #fbbf24;
 
-  --animate-scanline: scanline 8s linear infinite;
-  --animate-flicker: flicker 0.15s infinite;
-  --animate-glitch: glitch 2s linear infinite;
+  /* Blue family — matched to GitHub SVG accents */
+  --color-ctp-green: #38bdf8;
+  --color-ctp-teal: #22d3ee;
+  --color-ctp-sky: #67e8f9;
+  --color-ctp-sapphire: #60a5fa;
+  --color-ctp-blue: #3b82f6;
+  --color-ctp-lavender: #93c5fd;
+  --color-ctp-mauve: #a5b4fc;
 
-  @keyframes scanline {
+  /* Text — neutral grays (not blue-tinted) */
+  --color-ctp-text: #cdd6f4;
+  --color-ctp-subtext1: #bac2de;
+  --color-ctp-subtext0: #a6adc8;
+  --color-ctp-overlay2: #9399b2;
+  --color-ctp-overlay1: #7f849c;
+  --color-ctp-overlay0: #6c7086;
+
+  /* Surfaces — pure neutral dark (no blue tint) */
+  --color-ctp-surface2: #444444;
+  --color-ctp-surface1: #333333;
+  --color-ctp-surface0: #252525;
+  --color-ctp-base: #1a1a1a;
+  --color-ctp-mantle: #111111;
+  --color-ctp-crust: #0a0a0a;
+
+  --animate-cursor-blink: cursor-blink 1s step-end infinite;
+  --animate-fade-in: fade-in 0.25s ease-out forwards;
+  --animate-slide-up: slide-up 0.2s ease-out forwards;
+  --animate-line-appear: line-appear 0.15s ease-out forwards;
+  --animate-pulse-subtle: pulse-subtle 2s ease-in-out infinite;
+  --animate-typing: typing 0.8s steps(20, end);
+  --animate-progress-fill: progress-fill 0.6s ease-out forwards;
+
+  @keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes line-appear {
+    from { opacity: 0; transform: translateX(-4px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes pulse-subtle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  @keyframes progress-fill {
+    from { width: 0%; }
+  }
+
+  @keyframes boot-flicker {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    12% { opacity: 0.3; }
+    14% { opacity: 1; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes scanline-subtle {
     0% { transform: translateY(-100%); }
     100% { transform: translateY(100vh); }
   }
 
-  @keyframes flicker {
-    0% { opacity: 0.95; }
-    50% { opacity: 0.85; }
-    100% { opacity: 0.95; }
-  }
-
-  @keyframes glitch {
-    2%, 64% { transform: translate(2px, 0) skew(0deg); }
-    4%, 60% { transform: translate(-2px, 0) skew(0deg); }
-    62% { transform: translate(0, 0) skew(5deg); }
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 0 1px #252525, 0 4px 30px rgba(0,0,0,0.6), 0 0 60px rgba(56,189,248,0.03); }
+    50% { box-shadow: 0 0 0 1px #252525, 0 4px 30px rgba(0,0,0,0.6), 0 0 80px rgba(56,189,248,0.06); }
   }
 }
 
-:root {
-  --primary-color: #00ff00;
-  --bg-color: #000000;
-  --text-glow: 0 0 5px rgba(0, 255, 0, 0.4);
+/* ═══════════════════════════════════════════════════════════
+   Base Styles
+   ═══════════════════════════════════════════════════════════ */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  background-color: var(--bg-color);
-  color: var(--primary-color);
-  font-family: 'Fira Code', 'JetBrains Mono', monospace;
+html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
   overflow: hidden;
+  background-color: #0a0a0a;
+  color: #cdd6f4;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 }
 
-/* Custom scrollbar for terminal */
+::selection {
+  background-color: #333333;
+  color: #cdd6f4;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Scrollbar
+   ═══════════════════════════════════════════════════════════ */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.8);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary-color);
-  border-radius: 4px;
+  background: #333333;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #fff;
+  background: #444444;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Terminal Utilities
+   ═══════════════════════════════════════════════════════════ */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Blinking cursor for input */
+.terminal-cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.1em;
+  background-color: #38bdf8;
+  animation: cursor-blink 1s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 1px;
+}
+
+/* Terminal window — subtle glow */
+.terminal-window {
+  box-shadow:
+    0 0 0 1px #252525,
+    0 4px 30px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(56, 189, 248, 0.03);
+  animation: glow-pulse 6s ease-in-out infinite;
+}
+
+/* Subtle ambient scanline (very faint, professional) */
+.terminal-scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    transparent 50%,
+    rgba(0, 0, 0, 0.015) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* Boot text flicker */
+.boot-flicker {
+  animation: boot-flicker 0.3s ease-out;
+}
+
+/* Prompt colors */
+.prompt-user { color: #38bdf8; }
+.prompt-at { color: #a6adc8; }
+.prompt-host { color: #60a5fa; }
+.prompt-colon { color: #cdd6f4; }
+.prompt-path { color: #a5b4fc; }
+.prompt-symbol { color: #cdd6f4; }
+
+/* Skill bar animation */
+.skill-bar-fill {
+  animation: progress-fill 0.8s ease-out forwards;
+}
+
+/* Output line animation */
+.output-line {
+  animation: line-appear 0.15s ease-out forwards;
+}
+
+/* Status bar separator dots */
+.status-dot {
+  color: #585b70;
+}
+
+/* Traffic light dots */
+.traffic-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.traffic-dot.red { background-color: #f87171; }
+.traffic-dot.yellow { background-color: #fbbf24; }
+.traffic-dot.green { background-color: #38bdf8; }
+
+/* Quiz option hover */
+.quiz-option {
+  transition: all 0.15s ease;
+}
+.quiz-option:hover {
+  background-color: rgba(69, 71, 90, 0.3);
+}
+
+/* Link styles in terminal */
+.terminal-link {
+  color: #60a5fa;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(96, 165, 250, 0.3);
+  transition: all 0.15s ease;
+}
+.terminal-link:hover {
+  color: #93c5fd;
+  border-bottom-color: rgba(147, 197, 253, 0.5);
+}
+
+/* Mobile: larger touch targets */
+@media (max-width: 640px) {
+  .terminal-input-area {
+    font-size: 16px; /* Prevents iOS zoom */
+  }
 }

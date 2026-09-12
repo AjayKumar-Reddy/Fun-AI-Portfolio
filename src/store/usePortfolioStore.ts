@@ -1,84 +1,80 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
-export type Theme = 'matrix' | 'cyberpunk' | 'hacker';
-export type ActiveChallenge = 'none' | 'dsa' | 'system_design';
-
-export interface Achievement {
-  id: string;
-  name: string;
-  description: string;
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  answer: number; // 0-indexed correct option
+  category: string;
 }
 
-export const ACHIEVEMENTS: Record<string, Achievement> = {
-  first_command: { id: 'first_command', name: 'First Steps', description: 'Typed your first command' },
-  dsa_master: { id: 'dsa_master', name: 'Algorithm Master', description: 'Solved the DSA challenge' },
-  system_architect: { id: 'system_architect', name: 'System Architect', description: 'Solved the system design challenge' },
-  hacker_man: { id: 'hacker_man', name: 'Full Access', description: 'Unlocked all sections' },
-  easter_egg: { id: 'easter_egg', name: 'Easter Egg Hunter', description: 'Found a hidden command' },
-};
+export interface QuizState {
+  active: boolean;
+  questions: QuizQuestion[];
+  currentIndex: number;
+  score: number;
+}
 
 interface PortfolioState {
-  isBooting: boolean;
-  theme: Theme;
-  activeChallenge: ActiveChallenge;
-  challengeStep: number;
-  sdQuestionIndex: number; // Added to track which question was asked
-  unlockedProjects: boolean;
-  unlockedAbout: boolean;
+  booted: boolean;
   commandHistory: string[];
+  quiz: QuizState;
   achievements: string[];
+  sessionStart: number;
+
   completeBoot: () => void;
-  setTheme: (theme: Theme) => void;
-  setActiveChallenge: (challenge: ActiveChallenge) => void;
-  setChallengeStep: (step: number) => void;
-  setSdQuestionIndex: (index: number) => void;
-  unlockProjects: () => void;
-  unlockAbout: () => void;
-  addCommandToHistory: (command: string) => void;
+  addCommandToHistory: (cmd: string) => void;
+  startQuiz: (questions: QuizQuestion[]) => void;
+  answerQuiz: (correct: boolean) => void;
+  endQuiz: () => void;
   addAchievement: (id: string) => void;
 }
 
-export const usePortfolioStore = create<PortfolioState>()(
-  persist(
-    (set) => ({
-      isBooting: true,
-      theme: 'matrix',
-      activeChallenge: 'none',
-      challengeStep: 0,
-      sdQuestionIndex: -1,
-      unlockedProjects: false,
-      unlockedAbout: false,
-      commandHistory: [],
-      achievements: [],
-      completeBoot: () => set({ isBooting: false }),
-      setTheme: (theme) => set({ theme }),
-      setActiveChallenge: (challenge) => set({ activeChallenge: challenge, challengeStep: 0, sdQuestionIndex: -1 }),
-      setChallengeStep: (step) => set({ challengeStep: step }),
-      setSdQuestionIndex: (index) => set({ sdQuestionIndex: index }),
-      unlockProjects: () => set({ unlockedProjects: true }),
-      unlockAbout: () => set({ unlockedAbout: true }),
-      addCommandToHistory: (command) =>
-        set((state) => ({
-          commandHistory: [...state.commandHistory, command].slice(-100),
-        })),
-      addAchievement: (id) =>
-        set((state) => {
-          if (!state.achievements.includes(id)) {
-            return { achievements: [...state.achievements, id] };
-          }
-          return state;
-        }),
+export const usePortfolioStore = create<PortfolioState>()((set) => ({
+  booted: false,
+  commandHistory: [],
+  quiz: {
+    active: false,
+    questions: [],
+    currentIndex: 0,
+    score: 0,
+  },
+  achievements: [],
+  sessionStart: Date.now(),
+
+  completeBoot: () => set({ booted: true }),
+
+  addCommandToHistory: (cmd) =>
+    set((s) => ({
+      commandHistory: [...s.commandHistory, cmd].slice(-50),
+    })),
+
+  startQuiz: (questions) =>
+    set({
+      quiz: {
+        active: true,
+        questions,
+        currentIndex: 0,
+        score: 0,
+      },
     }),
-    {
-      name: 'portfolio-terminal-storage',
-      partialize: (state) => ({
-        theme: state.theme,
-        unlockedProjects: state.unlockedProjects,
-        unlockedAbout: state.unlockedAbout,
-        commandHistory: state.commandHistory,
-        achievements: state.achievements,
-      }),
-    }
-  )
-);
+
+  answerQuiz: (correct) =>
+    set((s) => ({
+      quiz: {
+        ...s.quiz,
+        score: correct ? s.quiz.score + 1 : s.quiz.score,
+        currentIndex: s.quiz.currentIndex + 1,
+      },
+    })),
+
+  endQuiz: () =>
+    set((s) => ({
+      quiz: { ...s.quiz, active: false },
+    })),
+
+  addAchievement: (id) =>
+    set((s) => {
+      if (s.achievements.includes(id)) return s;
+      return { achievements: [...s.achievements, id] };
+    }),
+}));

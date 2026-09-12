@@ -1,13 +1,29 @@
 import type { Metadata } from 'next';
-import { Fira_Code } from 'next/font/google';
+import { JetBrains_Mono } from 'next/font/google';
 import './globals.css';
-import './styles/terminal.css';
 
-const firaCode = Fira_Code({ subsets: ['latin'], variable: '--font-fira-code' });
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
-  title: 'Ajay Kumar | AI Developer Portfolio',
-  description: 'Interactive Hacker-Themed Developer Portfolio of Ajay Kumar',
+  title: 'Ajay Kumar S — Software Engineer',
+  description:
+    'Interactive Linux terminal portfolio of Ajay Kumar S — Full Stack Developer & CS undergraduate at MS Ramaiah Institute of Technology, Bengaluru.',
+  keywords: [
+    'Ajay Kumar S',
+    'portfolio',
+    'software engineer',
+    'full stack developer',
+    'MSRIT',
+    'terminal portfolio',
+    'Java',
+    'Spring Boot',
+    'Next.js',
+    'React',
+  ],
 };
 
 export default function RootLayout({
@@ -16,12 +32,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${firaCode.variable}`}>
-      <body className="bg-black text-[#00ff00] font-mono selection:bg-[#00ff00] selection:text-black min-h-screen overflow-hidden">
-        <div className="crt h-screen w-screen relative">
-          <div className="scanline"></div>
-          {children}
-        </div>
+    <html lang="en" className={jetbrainsMono.variable}>
+      <body className="bg-ctp-crust text-ctp-text font-[family-name:var(--font-jetbrains)] min-h-screen overflow-hidden selection:bg-ctp-surface2 selection:text-ctp-text">
+        {children}
       </body>
     </html>
   );
