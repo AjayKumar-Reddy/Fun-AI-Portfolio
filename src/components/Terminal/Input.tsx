@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useRef } from 'react';
 import { usePortfolioStore } from '@/store/usePortfolioStore';
 
@@ -12,6 +14,7 @@ export const Input: React.FC<InputProps> = ({ onCommand, disabled = false }) => 
   const inputRef = useRef<HTMLInputElement>(null);
   
   const commandHistory = usePortfolioStore((state) => state.commandHistory);
+  const isQuizActive = usePortfolioStore((state) => state.quiz.active);
 
   // Auto focus
   useEffect(() => {
@@ -22,7 +25,11 @@ export const Input: React.FC<InputProps> = ({ onCommand, disabled = false }) => 
     };
     focusInput();
     document.addEventListener('click', focusInput);
-    return () => document.removeEventListener('click', focusInput);
+    document.addEventListener('touchstart', focusInput);
+    return () => {
+      document.removeEventListener('click', focusInput);
+      document.removeEventListener('touchstart', focusInput);
+    };
   }, [disabled]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -50,25 +57,51 @@ export const Input: React.FC<InputProps> = ({ onCommand, disabled = false }) => 
         setInput('');
       }
     } else if (e.key === 'c' && e.ctrlKey) {
-       setInput('');
+      setInput('');
+      setHistoryIndex(-1);
+    } else if (e.key === 'l' && e.ctrlKey) {
+      e.preventDefault();
+      onCommand('clear');
+      setInput('');
     }
   };
 
   return (
-    <div className="flex items-center text-[#00ff00] font-mono">
-      <span className="mr-2 text-fuchsia-500 font-bold whitespace-nowrap">user@ajay-system:~$</span>
-      <input
-        ref={inputRef}
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        disabled={disabled}
-        className="flex-1 bg-transparent outline-none border-none text-current"
-        spellCheck={false}
-        autoComplete="off"
-        autoCapitalize="off"
-      />
+    <div className="flex items-center font-mono text-sm sm:text-base py-1">
+      {/* Prompt */}
+      {isQuizActive ? (
+        <span className="mr-1.5 whitespace-nowrap select-none">
+          <span className="text-ctp-yellow font-semibold">quiz</span>
+          <span className="text-ctp-text">&gt; </span>
+        </span>
+      ) : (
+        <span className="mr-1.5 whitespace-nowrap select-none">
+          <span className="text-ctp-green font-semibold">ajay</span>
+          <span className="text-ctp-text">@</span>
+          <span className="text-ctp-blue font-semibold">portfolio</span>
+          <span className="text-ctp-text">:</span>
+          <span className="text-ctp-mauve font-semibold">~</span>
+          <span className="text-ctp-text">$ </span>
+        </span>
+      )}
+      
+      {/* Input field */}
+      <div className="flex-1 relative">
+        <input
+          ref={inputRef}
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
+          className="w-full bg-transparent outline-none border-none text-ctp-text terminal-input-area caret-ctp-green"
+          spellCheck={false}
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          aria-label="Terminal input"
+        />
+      </div>
     </div>
   );
 };
