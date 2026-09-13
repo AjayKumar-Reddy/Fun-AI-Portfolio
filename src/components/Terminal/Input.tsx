@@ -16,19 +16,32 @@ export const Input: React.FC<InputProps> = ({ onCommand, disabled = false }) => 
   const commandHistory = usePortfolioStore((state) => state.commandHistory);
   const isQuizActive = usePortfolioStore((state) => state.quiz.active);
 
-  // Auto focus
+  // Auto focus (desktop only; on touch devices avoid auto-focusing on mount so keyboard doesn't jump or push content)
   useEffect(() => {
+    const isTouchDevice =
+      typeof window !== 'undefined' &&
+      ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
     const focusInput = () => {
       if (!disabled && inputRef.current) {
-        inputRef.current.focus();
+        inputRef.current.focus({ preventScroll: true });
       }
     };
-    focusInput();
-    document.addEventListener('click', focusInput);
-    document.addEventListener('touchstart', focusInput);
+
+    // Auto-focus on desktop
+    if (!isTouchDevice) {
+      focusInput();
+    }
+
+    const handleClick = (e: MouseEvent) => {
+      const selection = window.getSelection();
+      if (selection && selection.toString().length > 0) return;
+      focusInput();
+    };
+
+    document.addEventListener('click', handleClick);
     return () => {
-      document.removeEventListener('click', focusInput);
-      document.removeEventListener('touchstart', focusInput);
+      document.removeEventListener('click', handleClick);
     };
   }, [disabled]);
 

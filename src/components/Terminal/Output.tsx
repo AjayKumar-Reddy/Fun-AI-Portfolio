@@ -15,12 +15,6 @@ interface OutputProps {
 }
 
 export const Output: React.FC<OutputProps> = ({ lines }) => {
-  const bottomRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [lines]);
-
   return (
     <div className="flex flex-col space-y-0.5 mb-2 font-mono">
       <AnimatePresence initial={false}>
@@ -35,7 +29,8 @@ export const Output: React.FC<OutputProps> = ({ lines }) => {
               ease: 'easeOut',
             }}
             className={cn(
-              'w-full whitespace-pre-wrap break-words',
+              'w-full',
+              line.id === 'welcome-banner' ? 'overflow-x-auto no-scrollbar' : 'whitespace-pre-wrap break-words',
               line.isCommand
                 ? 'text-ctp-text'
                 : 'text-ctp-subtext1'
@@ -55,7 +50,6 @@ export const Output: React.FC<OutputProps> = ({ lines }) => {
           </motion.div>
         ))}
       </AnimatePresence>
-      <div ref={bottomRef} />
     </div>
   );
 };
