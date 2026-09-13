@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -26,14 +26,23 @@ export const metadata: Metadata = {
   ],
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#0a0a0a',
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={jetbrainsMono.variable}>
-      <body className="bg-ctp-crust text-ctp-text font-[family-name:var(--font-jetbrains)] min-h-screen overflow-hidden selection:bg-ctp-surface2 selection:text-ctp-text">
+    <html lang="en" className={`${jetbrainsMono.variable} h-full overflow-hidden`}>
+      <body className="bg-ctp-crust text-ctp-text font-[family-name:var(--font-jetbrains)] fixed inset-0 w-full h-[100dvh] overflow-hidden overscroll-none selection:bg-ctp-surface2 selection:text-ctp-text">
         {children}
       </body>
     </html>
